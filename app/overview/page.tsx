@@ -67,7 +67,7 @@ export default function Overview() {
   };
 
   // Handle mark complete
-  const handleMarkComplete = (id: string, title: string) => {
+  const handleMarkComplete = (id: string) => {
     // Start animation
     setPriorityRecommendations(prev => 
       prev.map(rec => rec.id === id ? { ...rec, animating: 'complete' } : rec)
@@ -185,7 +185,7 @@ export default function Overview() {
                             </button>
 
                             <button 
-                              onClick={() => handleMarkComplete(item.id, item.title)}
+                              onClick={() => handleMarkComplete(item.id)}
                               className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-2xl hover:bg-gray-50 transition-colors"
                             >
                               {item.secondaryButton.text}
@@ -240,7 +240,7 @@ export default function Overview() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Have questions? We're here to help</h3>
+                  <h3 className="font-semibold text-gray-900 mb-1">Have questions? We&apos;re here to help</h3>
                   <p className="text-sm text-gray-600">
                     View our{' '}
                     <a href="#" className="text-linkedin-blue hover:underline font-medium">help articles</a>

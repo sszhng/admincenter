@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Header from '../../components/Header';
 import Sidebar from '../../components/Sidebar';
 
@@ -161,7 +161,7 @@ export default function Recommendations() {
   };
 
   // Handle mark complete
-  const handleMarkComplete = (id: string, type: 'recruiter' | 'jobs', title: string) => {
+  const handleMarkComplete = (id: string, type: 'recruiter' | 'jobs') => {
     const updateRecommendations = type === 'recruiter' ? setRecruiterRecommendations : setJobsRecommendations;
     
     // Start animation
@@ -341,7 +341,7 @@ export default function Recommendations() {
                       rec={rec}
                       type="recruiter"
                       onDismiss={() => handleDismiss(rec.id, 'recruiter')}
-                      onComplete={() => handleMarkComplete(rec.id, 'recruiter', rec.title)}
+                      onComplete={() => handleMarkComplete(rec.id, 'recruiter')}
                     />
                   </div>
                 ))}
@@ -398,7 +398,7 @@ export default function Recommendations() {
                       rec={rec}
                       type="jobs"
                       onDismiss={() => handleDismiss(rec.id, 'jobs')}
-                      onComplete={() => handleMarkComplete(rec.id, 'jobs', rec.title)}
+                      onComplete={() => handleMarkComplete(rec.id, 'jobs')}
                     />
                   </div>
                 ))}

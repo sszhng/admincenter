@@ -5,7 +5,7 @@ import Header from '../../components/Header';
 import Sidebar from '../../components/Sidebar';
 
 export default function UserLicenseManagement() {
-  const [activeTab, setActiveTab] = useState('Users');
+  const [, setActiveTab] = useState('Users');
 
   const users = [
     { id: 1, name: 'John Smith', email: 'john.smith@flexis.com', role: 'Recruiter User', status: 'Active', lastActive: '2 hours ago' },
