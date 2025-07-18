@@ -3,16 +3,7 @@
 import React, { useState } from 'react';
 import Header from '../../components/Header';
 import Sidebar from '../../components/Sidebar';
-
-interface Recommendation {
-  id: string;
-  title: string;
-  description: string;
-  primaryButton: { text: string; variant: 'outline' | 'primary'; icon?: boolean };
-  secondaryButton: { text: string };
-  status: 'active' | 'dismissed' | 'completed';
-  animating?: 'dismiss' | 'complete' | null;
-}
+import { useRecommendations, type Recommendation } from '../../contexts/RecommendationsContext';
 
 export default function Recommendations() {
   const [activeTab, setActiveTab] = useState('Active');
@@ -20,115 +11,110 @@ export default function Recommendations() {
   const [jobsExpanded, setJobsExpanded] = useState(false);
   const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: '', visible: false });
 
-  // All LinkedIn Recruiter recommendations (4 total)
-  const [recruiterRecommendations, setRecruiterRecommendations] = useState<Recommendation[]>([
-    {
-      id: 'recruiter-1',
-      title: 'Assign a license to a new user',
-      description: 'Invite new Recruiter users by assigning your first license. Tip: The "Recruiter User" role is commonly used role for job posting and recruiting.',
-      primaryButton: { text: 'Add a new user', variant: 'outline' as const },
-      secondaryButton: { text: 'Mark complete' },
-      status: 'active'
-    },
-    {
-      id: 'recruiter-2',
-      title: 'Share resources to get users started with Recruiter',
-      description: 'Share self-guided resources to help your organization learn Recruiter basics.',
-      primaryButton: { text: 'Explore resources', variant: 'outline' as const, icon: true },
-      secondaryButton: { text: 'Mark complete' },
-      status: 'active'
-    },
-    {
-      id: 'recruiter-3',
-      title: 'Explore all hiring integrations',
-      description: 'Save up to 3.5 hours a week for your users by integrating Recruiter with your ATS, CRM, and more.',
-      primaryButton: { text: 'Find integrations', variant: 'outline' as const, icon: true },
-      secondaryButton: { text: 'Mark complete' },
-      status: 'active'
-    },
-    {
-      id: 'recruiter-4',
-      title: 'Sign up for the Recruiter admin webinar',
-      description: 'Join an interactive, live webinar to learn about admin capabilities, and how to set your team up for success.',
-      primaryButton: { text: 'Sign up', variant: 'outline' as const, icon: true },
-      secondaryButton: { text: 'Mark complete' },
-      status: 'active'
-    }
-  ]);
+  const { 
+    recommendations, 
+    updateRecommendationStatus, 
+    setRecommendationAnimating,
+    getRecruiterRecommendations,
+    getJobsRecommendations,
+    getTotalCounts
+  } = useRecommendations();
 
-  // All LinkedIn Jobs recommendations (5 total)
-  const [jobsRecommendations, setJobsRecommendations] = useState<Recommendation[]>([
-    {
-      id: 'jobs-1',
-      title: 'Learn how to start posting jobs',
-      description: 'Review learning resources to help your organization learn the basics of Jobs.',
-      primaryButton: { text: 'Explore resources', variant: 'outline' as const, icon: true },
-      secondaryButton: { text: 'Mark complete' },
-      status: 'active'
-    },
-    {
-      id: 'jobs-2',
-      title: 'Add a job source to Recruiter',
-      description: 'Connect your ATS or other job sources to ensure 100% utilization of your job slots and save time by automating job posting on LinkedIn, if you have an eligible source.',
-      primaryButton: { text: 'Add job source', variant: 'outline' as const, icon: true },
-      secondaryButton: { text: 'Mark complete' },
-      status: 'active'
-    },
-    {
-      id: 'jobs-3',
-      title: 'Set up applicant source tracking code',
-      description: 'Track candidates from click to application completion on your applicant tracking system (ATS), if you added a job source.',
-      primaryButton: { text: 'Set up tracking', variant: 'outline' as const, icon: true },
-      secondaryButton: { text: 'Mark complete' },
-      status: 'active'
-    },
-    {
-      id: 'jobs-4',
-      title: 'Allocate job slots to users',
-      description: 'Allocate job slots to Recruiter seats, if you added a job source.',
-      primaryButton: { text: 'Activate job slots', variant: 'outline' as const, icon: true },
-      secondaryButton: { text: 'Mark complete' },
-      status: 'active'
-    },
-    {
-      id: 'jobs-5',
-      title: 'Set up promotions',
-      description: 'Explore and manage job promotion settings for all users, such as promotion and exclusion rules if you added a job source.',
-      primaryButton: { text: 'Manage settings', variant: 'outline' as const, icon: true },
-      secondaryButton: { text: 'Mark complete' },
-      status: 'active'
-    }
-  ]);
+  const recruiterRecommendations = getRecruiterRecommendations();
+  const jobsRecommendations = getJobsRecommendations();
 
-  // Filter recommendations based on active tab and expansion state
+  // Helper function to filter recommendations
   const getFilteredRecommendations = (recommendations: Recommendation[], expanded: boolean) => {
     let filtered = recommendations;
     
-    if (activeTab === 'Active (9)') {
+    if (activeTab === 'Active') {
       filtered = recommendations.filter(rec => rec.status === 'active');
     } else if (activeTab === 'Completed') {
       filtered = recommendations.filter(rec => rec.status === 'completed');
     } else if (activeTab === 'Dismissed') {
       filtered = recommendations.filter(rec => rec.status === 'dismissed');
     }
-
+    
     return expanded ? filtered : filtered.slice(0, 3);
   };
 
   const visibleRecruiterRecommendations = getFilteredRecommendations(recruiterRecommendations, recruiterExpanded);
   const visibleJobsRecommendations = getFilteredRecommendations(jobsRecommendations, jobsExpanded);
 
-  // Calculate counts for progress bars
-  const recruiterActive = recruiterRecommendations.filter(rec => rec.status === 'active').length;
-  const recruiterCompleted = recruiterRecommendations.filter(rec => rec.status === 'completed').length;
-  const recruiterTotal = recruiterRecommendations.filter(rec => rec.status !== 'dismissed').length;
+  // Get counts from context
+  const {
+    totalActive,
+    totalCompleted,
+    totalDismissed,
+    recruiterActive,
+    recruiterCompleted,
+    recruiterDismissed,
+    recruiterTotal,
+    jobsActive,
+    jobsCompleted,
+    jobsDismissed,
+    jobsTotal
+  } = getTotalCounts();
 
-  const jobsActive = jobsRecommendations.filter(rec => rec.status === 'active').length;
-  const jobsCompleted = jobsRecommendations.filter(rec => rec.status === 'completed').length;
-  const jobsTotal = jobsRecommendations.filter(rec => rec.status !== 'dismissed').length;
+  // Check if we should show sections based on current tab
+  const shouldShowRecruiterSection = () => {
+    if (activeTab === 'Active') return recruiterActive > 0;
+    if (activeTab === 'Completed') return recruiterCompleted > 0;
+    if (activeTab === 'Dismissed') return recruiterDismissed > 0;
+    return false;
+  };
 
-  // Calculate total active recommendations for tab
-  const totalActive = recruiterActive + jobsActive;
+  const shouldShowJobsSection = () => {
+    if (activeTab === 'Active') return jobsActive > 0;
+    if (activeTab === 'Completed') return jobsCompleted > 0;
+    if (activeTab === 'Dismissed') return jobsDismissed > 0;
+    return false;
+  };
+
+  const hasAnyRecommendations = () => {
+    if (activeTab === 'Active') return totalActive > 0;
+    if (activeTab === 'Completed') return totalCompleted > 0;
+    if (activeTab === 'Dismissed') return totalDismissed > 0;
+    return false;
+  };
+
+  // Empty state component
+  const EmptyState = () => {
+    let title = '';
+    let buttonText = '';
+    let buttonAction = '';
+
+    if (activeTab === 'Completed') {
+      title = 'You have no completed recommendations';
+      buttonText = 'View active recommendations';
+      buttonAction = 'Active';
+    } else if (activeTab === 'Dismissed') {
+      title = 'You have no dismissed recommendations';
+      buttonText = 'View active recommendations';
+      buttonAction = 'Active';
+    } else {
+      title = 'You have no active recommendations';
+      buttonText = '';
+      buttonAction = '';
+    }
+
+    return (
+      <div className="bg-white rounded-lg border border-gray-200">
+        <div className="flex flex-col items-center justify-center py-16 px-8">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">{title}</h3>
+          
+          {buttonText && (
+            <button
+              onClick={() => setActiveTab(buttonAction)}
+              className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            >
+              {buttonText}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   // Show toast notification
   const showToast = (message: string) => {
@@ -143,40 +129,127 @@ export default function Recommendations() {
     setToast({ message: '', visible: false });
   };
 
-  // Handle dismiss recommendation
-  const handleDismiss = (id: string, type: 'recruiter' | 'jobs') => {
-    const updateRecommendations = type === 'recruiter' ? setRecruiterRecommendations : setJobsRecommendations;
-    
+  // Handle dismiss
+  const handleDismiss = (id: string) => {
     // Start animation
-    updateRecommendations(prev => 
-      prev.map(rec => rec.id === id ? { ...rec, animating: 'dismiss' } : rec)
-    );
+    setRecommendationAnimating(id, 'dismiss');
 
-    // After animation, update status
+    // Update status after animation
     setTimeout(() => {
-      updateRecommendations(prev => 
-        prev.map(rec => rec.id === id ? { ...rec, status: 'dismissed', animating: null } : rec)
-      );
+      updateRecommendationStatus(id, 'dismissed');
+      showToast('Recommendation has been dismissed.');
     }, 300);
   };
 
   // Handle mark complete
-  const handleMarkComplete = (id: string, type: 'recruiter' | 'jobs') => {
-    const updateRecommendations = type === 'recruiter' ? setRecruiterRecommendations : setJobsRecommendations;
-    
+  const handleMarkComplete = (id: string) => {
     // Start animation
-    updateRecommendations(prev => 
-      prev.map(rec => rec.id === id ? { ...rec, animating: 'complete' } : rec)
-    );
+    setRecommendationAnimating(id, 'complete');
 
-    // After animation, update status and show toast
+    // Update status after animation and show toast
     setTimeout(() => {
-      updateRecommendations(prev => 
-        prev.map(rec => rec.id === id ? { ...rec, status: 'completed', animating: null } : rec)
-      );
+      updateRecommendationStatus(id, 'completed');
       showToast('Recommendation has been marked as complete.');
     }, 300);
   };
+
+  // Handle move to active (undo dismiss)
+  const handleMoveToActive = (id: string) => {
+    updateRecommendationStatus(id, 'active');
+    showToast('Recommendation has been moved to active.');
+  };
+
+  // RecommendationCard component
+  const RecommendationCard = ({ 
+    recommendation, 
+    onDismiss, 
+    onComplete,
+    onMoveToActive
+  }: { 
+    recommendation: Recommendation; 
+    onDismiss: () => void;
+    onComplete: () => void;
+    onMoveToActive?: () => void;
+  }) => (
+    <div 
+      className={`transition-all duration-300 ease-out ${
+        recommendation.animating === 'dismiss' ? 'transform -translate-x-full opacity-0' :
+        recommendation.animating === 'complete' ? 'transform translate-x-full opacity-0' :
+        'transform translate-x-0 opacity-100'
+      }`}
+    >
+      <div className="px-6 py-5">
+        <div className="relative">
+          {/* Top right action - varies by status */}
+          {recommendation.status === 'active' && (
+            <button 
+              onClick={onDismiss}
+              className="absolute top-0 right-0 text-dismiss-icon hover:text-dismiss-icon-hover transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+          
+          {recommendation.status === 'dismissed' && onMoveToActive && (
+            <button 
+              onClick={onMoveToActive}
+              className="absolute top-0 right-0 flex items-center gap-2 text-linkedin-blue hover:underline text-sm font-medium"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Move to active
+            </button>
+          )}
+
+          {/* Content */}
+          <div className={recommendation.status === 'dismissed' ? 'pr-32' : 'pr-8'}>
+            <h3 className="font-semibold text-gray-900 mb-1">{recommendation.title}</h3>
+            <p className="text-sm text-secondary mb-4">
+              {recommendation.description}
+              {' '}
+              <a href="#" className="text-linkedin-blue hover:underline font-medium">
+                Learn more
+              </a>
+            </p>
+
+            {/* Action buttons */}
+            <div className="flex gap-6">
+              {/* Primary CTA - show for both active and completed */}
+              {(recommendation.status === 'active' || recommendation.status === 'completed') && (
+                <button
+                  className={`px-4 h-8 text-sm font-medium rounded-[16px] border transition-colors ${
+                    recommendation.primaryButton.variant === 'outline'
+                      ? 'border-linkedin-blue text-linkedin-blue hover:bg-blue-50'
+                      : 'bg-linkedin-blue text-white border-linkedin-blue hover:bg-linkedin-blue-dark'
+                  } flex items-center gap-2`}
+                >
+                  {recommendation.primaryButton.text}
+                  {recommendation.primaryButton.icon && (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6m4-3h6v6m-11 5L21 3" />
+                    </svg>
+                  )}
+                </button>
+              )}
+
+              {/* Mark complete button - only show for active, text-only style */}
+              {recommendation.status === 'active' && (
+                <button 
+                  onClick={onComplete}
+                  className="px-0 h-8 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors flex items-center"
+                >
+                  {recommendation.secondaryButton.text}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   // Toast component
   const Toast = () => (
@@ -192,70 +265,12 @@ export default function Recommendations() {
         <span className="text-sm font-medium flex-1">{toast.message}</span>
         <button 
           onClick={dismissToast}
-          className="text-gray-400 hover:text-gray-600 flex-shrink-0"
+          className="text-dismiss-icon hover:text-dismiss-icon-hover flex-shrink-0"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-      </div>
-    </div>
-  );
-
-  const RecommendationCard = ({ rec, type, onDismiss, onComplete }: { 
-    rec: Recommendation, 
-    type: 'recruiter' | 'jobs',
-    onDismiss: () => void,
-    onComplete: () => void 
-  }) => (
-    <div className="p-6">
-      <div className="relative">
-        {/* Dismiss button */}
-        <button
-          onClick={onDismiss}
-          className="absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-
-        {/* Content */}
-        <div className="pr-8">
-          <h3 className="font-semibold text-gray-900 mb-2">{rec.title}</h3>
-          <p className="text-sm text-gray-600 mb-4">
-            {rec.description}
-            {' '}
-            <a href="#" className="text-blue-600 hover:underline font-medium">
-              Learn more
-            </a>
-          </p>
-
-          {/* Action buttons */}
-          <div className="flex gap-3">
-            <button
-              className={`px-4 py-2 text-sm font-medium rounded-2xl border transition-colors ${
-                rec.primaryButton.variant === 'outline'
-                  ? 'border-blue-600 text-blue-600 hover:bg-blue-50'
-                  : 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
-              } flex items-center gap-2`}
-            >
-              {rec.primaryButton.text}
-              {rec.primaryButton.icon && (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-              )}
-            </button>
-
-            <button 
-              onClick={onComplete}
-              className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-2xl hover:bg-gray-50 transition-colors"
-            >
-              {rec.secondaryButton.text}
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );
@@ -267,154 +282,156 @@ export default function Recommendations() {
       <div className="flex flex-1">
         <Sidebar />
         
-        <main className="flex-1">
-          {/* Page Header - White Background */}
+        <main className="flex-1 bg-page-canvas">
+          {/* White Content Container */}
           <div className="bg-white">
-            <div className="px-8 py-6">
+            <div className="px-8 py-6 border-b border-gray-200">
               <h1 className="text-2xl font-semibold text-gray-900">Recommendations</h1>
             </div>
           </div>
 
-          {/* Content - Gray Background */}
-          <div className="p-8 space-y-6">
-            {/* Filter Pills */}
-            <div className="bg-white rounded-lg border border-gray-200">
-              <div className="px-6 py-4">
-                <div className="flex gap-2">
-                  {[`Active (${totalActive})`, 'Completed', 'Dismissed'].map((tab) => {
-                    const tabKey = tab.startsWith('Active') ? 'Active' : tab;
-                    const isSelected = activeTab === tabKey;
+          {/* Gray Background Section */}
+          <div className="bg-page-canvas min-h-screen">
+            <div className="p-8 space-y-6">
+              {/* Filter Pills */}
+              <div className="bg-white rounded-lg border border-gray-200">
+                <div className="px-6 py-4">
+                  <div className="flex gap-2">
+                    {[
+                      { key: 'Active', label: `Active (${totalActive})` },
+                      { key: 'Completed', label: `Completed${totalCompleted > 0 ? ` (${totalCompleted})` : ''}` },
+                      { key: 'Dismissed', label: `Dismissed${totalDismissed > 0 ? ` (${totalDismissed})` : ''}` }
+                    ].map((tab) => {
+                      const isSelected = activeTab === tab.key;
+                      
+                      return (
+                        <button
+                          key={tab.key}
+                          onClick={() => setActiveTab(tab.key)}
+                          className={`px-4 h-8 text-sm font-medium rounded-[16px] border transition-colors flex items-center ${
+                            isSelected
+                              ? 'bg-[#01754f] text-white border-[#01754f]'
+                              : 'text-gray-700 border-gray-300 hover:bg-gray-50'
+                          }`}
+                        >
+                          {tab.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* LinkedIn Recruiter Section */}
+              {shouldShowRecruiterSection() && (
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden pt-1">
+                  {/* Section Header */}
+                  <div className="px-6 border-b border-gray-200 flex flex-col justify-center" style={{ height: '110px' }}>
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-900 mb-1">Onboard to LinkedIn Recruiter</h2>
+                                              <p className="text-sm text-secondary mb-1">Complete basic steps to find and hire quality talent for your company</p>
+                    </div>
                     
-                    return (
-                      <button
-                        key={tab}
-                        onClick={() => setActiveTab(tabKey)}
-                        className={`px-4 py-1 text-sm font-medium rounded-2xl border transition-colors ${
-                          isSelected
-                            ? 'bg-[#01754f] text-white border-[#01754f]'
-                            : 'text-gray-700 border-gray-300 hover:bg-gray-50'
-                        }`}
-                      >
-                        {tab}
-                      </button>
+                    {/* Progress Bar */}
+                    <div className="flex items-center gap-4 py-1">
+                                              <span className="text-sm text-secondary w-6">{recruiterCompleted}/{recruiterTotal}</span>
+                      <div className="flex-1 bg-gray-200 rounded-full h-2">
+                        <div 
+                          className="bg-[#01754F] h-2 rounded-full transition-all duration-500"
+                          style={{ width: `${recruiterTotal > 0 ? (recruiterCompleted / recruiterTotal) * 100 : 0}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Recommendation Cards */}
+                  <div className="divide-y divide-gray-200">
+                    {visibleRecruiterRecommendations.map((rec) => (
+                      <RecommendationCard
+                        key={rec.id}
+                        recommendation={rec}
+                        onDismiss={() => handleDismiss(rec.id)}
+                        onComplete={() => handleMarkComplete(rec.id)}
+                        onMoveToActive={() => handleMoveToActive(rec.id)}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Show More/Less Footer - White Background, Centered */}
+                  {(() => {
+                    const filteredCount = activeTab === 'Active' ? recruiterActive : 
+                                         activeTab === 'Completed' ? recruiterCompleted : 
+                                         recruiterDismissed;
+                    return filteredCount > 3 && (
+                      <div className="px-6 py-4 bg-white border-t border-gray-200 text-center">
+                        <button
+                          onClick={() => setRecruiterExpanded(!recruiterExpanded)}
+                          className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                        >
+                          {recruiterExpanded ? 'Show less' : `Show ${filteredCount - 3} more`}
+                        </button>
+                      </div>
                     );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* LinkedIn Recruiter Section */}
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              {/* Section Header */}
-              <div className="px-6 py-4 border-b border-gray-200">
-                <div className="space-y-4">
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900 mb-1">Onboard to LinkedIn Recruiter</h2>
-                    <p className="text-sm text-gray-600">Complete basic steps to find and hire quality talent for your company</p>
-                  </div>
-                  
-                  {/* Progress Bar */}
-                  <div className="flex items-center gap-4 py-1">
-                    <span className="text-sm text-gray-600 w-6">{recruiterCompleted}/{recruiterTotal}</span>
-                    <div className="flex-1 bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-linkedin-blue h-2 rounded-full transition-all duration-500"
-                        style={{ width: `${recruiterTotal > 0 ? (recruiterCompleted / recruiterTotal) * 100 : 0}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Recommendations */}
-              <div className="divide-y divide-gray-200">
-                {visibleRecruiterRecommendations.map((rec) => (
-                  <div 
-                    key={rec.id} 
-                    className={`transition-all duration-300 ease-out ${
-                      rec.animating === 'dismiss' ? 'transform -translate-x-full opacity-0' :
-                      rec.animating === 'complete' ? 'transform translate-x-full opacity-0' :
-                      'transform translate-x-0 opacity-100'
-                    }`}
-                  >
-                    <RecommendationCard
-                      rec={rec}
-                      type="recruiter"
-                      onDismiss={() => handleDismiss(rec.id, 'recruiter')}
-                      onComplete={() => handleMarkComplete(rec.id, 'recruiter')}
-                    />
-                  </div>
-                ))}
-              </div>
-
-              {/* Show More/Less Footer - White Background, Centered */}
-              {activeTab === 'Active' && recruiterActive > 3 && (
-                <div className="px-6 py-4 bg-white border-t border-gray-200 text-center">
-                  <button
-                    onClick={() => setRecruiterExpanded(!recruiterExpanded)}
-                    className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-                  >
-                    {recruiterExpanded ? 'Show less' : `Show ${recruiterActive - 3} more`}
-                  </button>
+                  })()}
                 </div>
               )}
-            </div>
 
-            {/* LinkedIn Jobs Section */}
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              {/* Section Header */}
-              <div className="px-6 py-4 border-b border-gray-200">
-                <div className="space-y-4">
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900 mb-1">Onboard to LinkedIn Jobs</h2>
-                    <p className="text-sm text-gray-600">Complete basic steps to post and promote jobs for your company</p>
-                  </div>
-                  
-                  {/* Progress Bar */}
-                  <div className="flex items-center gap-4 py-1">
-                    <span className="text-sm text-gray-600 w-6">{jobsCompleted}/{jobsTotal}</span>
-                    <div className="flex-1 bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-linkedin-blue h-2 rounded-full transition-all duration-500"
-                        style={{ width: `${jobsTotal > 0 ? (jobsCompleted / jobsTotal) * 100 : 0}%` }}
-                      ></div>
+              {/* LinkedIn Jobs Section */}
+              {shouldShowJobsSection() && (
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden pt-1">
+                  {/* Section Header */}
+                  <div className="px-6 border-b border-gray-200 flex flex-col justify-center" style={{ height: '110px' }}>
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-900 mb-1">Onboard to LinkedIn Jobs</h2>
+                                              <p className="text-sm text-secondary mb-1">Complete basic steps to effectively post and promote your jobs</p>
+                    </div>
+                    
+                    {/* Progress Bar */}
+                    <div className="flex items-center gap-4 py-1">
+                                              <span className="text-sm text-secondary w-6">{jobsCompleted}/{jobsTotal}</span>
+                      <div className="flex-1 bg-gray-200 rounded-full h-2">
+                        <div 
+                          className="bg-[#01754F] h-2 rounded-full transition-all duration-500"
+                          style={{ width: `${jobsTotal > 0 ? (jobsCompleted / jobsTotal) * 100 : 0}%` }}
+                        ></div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Recommendations */}
-              <div className="divide-y divide-gray-200">
-                {visibleJobsRecommendations.map((rec) => (
-                  <div 
-                    key={rec.id} 
-                    className={`transition-all duration-300 ease-out ${
-                      rec.animating === 'dismiss' ? 'transform -translate-x-full opacity-0' :
-                      rec.animating === 'complete' ? 'transform translate-x-full opacity-0' :
-                      'transform translate-x-0 opacity-100'
-                    }`}
-                  >
-                    <RecommendationCard
-                      rec={rec}
-                      type="jobs"
-                      onDismiss={() => handleDismiss(rec.id, 'jobs')}
-                      onComplete={() => handleMarkComplete(rec.id, 'jobs')}
-                    />
+                  {/* Recommendation Cards */}
+                  <div className="divide-y divide-gray-200">
+                    {visibleJobsRecommendations.map((rec) => (
+                      <RecommendationCard
+                        key={rec.id}
+                        recommendation={rec}
+                        onDismiss={() => handleDismiss(rec.id)}
+                        onComplete={() => handleMarkComplete(rec.id)}
+                        onMoveToActive={() => handleMoveToActive(rec.id)}
+                      />
+                    ))}
                   </div>
-                ))}
-              </div>
 
-              {/* Show More/Less Footer - White Background, Centered */}
-              {activeTab === 'Active' && jobsActive > 3 && (
-                <div className="px-6 py-4 bg-white border-t border-gray-200 text-center">
-                  <button
-                    onClick={() => setJobsExpanded(!jobsExpanded)}
-                    className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-                  >
-                    {jobsExpanded ? 'Show less' : `Show ${jobsActive - 3} more`}
-                  </button>
+                  {/* Show More/Less Footer - White Background, Centered */}
+                  {(() => {
+                    const filteredCount = activeTab === 'Active' ? jobsActive : 
+                                         activeTab === 'Completed' ? jobsCompleted : 
+                                         jobsDismissed;
+                    return filteredCount > 3 && (
+                      <div className="px-6 py-4 bg-white border-t border-gray-200 text-center">
+                        <button
+                          onClick={() => setJobsExpanded(!jobsExpanded)}
+                          className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                        >
+                          {jobsExpanded ? 'Show less' : `Show ${filteredCount - 3} more`}
+                        </button>
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
+
+              {/* Show empty state if no recommendations in current tab */}
+              {!hasAnyRecommendations() && <EmptyState />}
             </div>
           </div>
         </main>

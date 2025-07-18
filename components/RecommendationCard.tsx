@@ -29,7 +29,7 @@ export default function RecommendationCard({
       {onDismiss && (
         <button
           onClick={onDismiss}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+          className="absolute top-4 right-4 text-dismiss-icon hover:text-dismiss-icon-hover"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -40,7 +40,7 @@ export default function RecommendationCard({
       {/* Content */}
       <div className="pr-8">
         <h3 className="font-semibold text-gray-900 mb-2">{title}</h3>
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-secondary mb-4">
           {description}
           {learnMoreLink && (
             <span>
@@ -64,7 +64,7 @@ export default function RecommendationCard({
             {primaryButton.text}
             {primaryButton.icon && (
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6m4-3h6v6m-11 5L21 3" />
               </svg>
             )}
           </button>

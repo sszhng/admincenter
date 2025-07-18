@@ -33,7 +33,7 @@ function NavItem({ href, children, isSelected }: NavItemProps) {
       {isSelected && (
         <div className="absolute left-0 top-0 h-full w-1 bg-[rgba(0,0,0,0.9)]" />
       )}
-      <div className={`flex w-full items-center py-3 ${isSelected ? 'pl-5' : 'pl-6'} pr-4`}>
+      <div className="flex w-full items-center py-3 pl-6 pr-4">
         <span className="text-[16px] font-semibold tracking-[-0.32px] leading-[1.25]">
           {children}
         </span>

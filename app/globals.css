@@ -49,3 +49,16 @@ body {
 .hover\:bg-linkedin-blue-dark:hover {
   background-color: #004182;
 }
+
+/* Custom Colors */
+.text-dismiss-icon {
+  color: #404040;
+}
+
+.hover\:text-dismiss-icon-hover:hover {
+  color: #404040;
+}
+
+.text-secondary {
+  color: #666666;
+}
