@@ -5,14 +5,39 @@ import Header from '../../components/Header';
 import Sidebar from '../../components/Sidebar';
 
 export default function UserLicenseManagement() {
-  const [, setActiveTab] = useState('Users');
+  const [activeTab, setActiveTab] = useState('Users');
 
   const users = [
-    { id: 1, name: 'John Smith', email: 'john.smith@flexis.com', role: 'Recruiter User', status: 'Active', lastActive: '2 hours ago' },
-    { id: 2, name: 'Sarah Johnson', email: 'sarah.johnson@flexis.com', role: 'Hiring Manager', status: 'Active', lastActive: '1 day ago' },
-    { id: 3, name: 'Mike Chen', email: 'mike.chen@flexis.com', role: 'Admin', status: 'Active', lastActive: '3 hours ago' },
-    { id: 4, name: 'Emily Davis', email: 'emily.davis@flexis.com', role: 'Recruiter User', status: 'Inactive', lastActive: '1 week ago' }
+    { 
+      id: 1, 
+      email: 'akingsley@flexis.com', 
+      initials: 'A',
+      license: 'Hiring Project Creator License',
+      manualJobPosting: 'Allow',
+      status: 'Invited',
+      date: 'Nov 7, 2024'
+    },
+    { 
+      id: 2, 
+      email: 'fatimahas@flexis.com', 
+      initials: 'F',
+      license: 'Hiring Project Creator License',
+      manualJobPosting: 'Allow',
+      status: 'Invited',
+      date: 'Nov 7, 2024'
+    },
+    { 
+      id: 3, 
+      email: 'emiliakl@flexis.com', 
+      initials: 'E',
+      license: 'Hiring Project Creator License',
+      manualJobPosting: 'Allow',
+      status: 'Invited',
+      date: 'Nov 7, 2024'
+    }
   ];
+
+  const tabs = ['Users', 'Groups', 'Licenses', 'Settings', 'Activity log'];
 
   return (
     <div className="min-h-screen bg-page-canvas flex flex-col">
@@ -22,150 +47,190 @@ export default function UserLicenseManagement() {
         <Sidebar />
         
         <main className="flex-1">
-          {/* Page Header - White Background */}
-          <div className="bg-white">
+          {/* Page Content */}
+          <div className="bg-white min-h-full">
             <div className="px-8 py-6">
-              <h1 className="text-2xl font-semibold text-gray-900">User & license management</h1>
-            </div>
-          </div>
+              {/* Breadcrumb */}
+              <div className="flex items-center gap-1 text-sm text-gray-600 mb-4">
+                <span>User & license management</span>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+                <span>Recruiter</span>
+              </div>
 
-          {/* Content - Gray Background */}
-          <div className="p-8 space-y-6">
-            {/* Tabs */}
-            <div className="bg-white rounded-lg border border-gray-200">
-              <div className="px-6 py-4">
-                <div className="flex gap-2">
-                  {['Users', 'Licenses', 'Groups'].map((tab) => (
+              {/* Page Header */}
+              <div className="flex items-center justify-between mb-6">
+                <h1 className="text-2xl font-semibold text-gray-900">Flexis Recruiter 1882003</h1>
+                <button className="flex items-center gap-2 text-linkedin-blue hover:underline font-medium">
+                  Go to Recruiter
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Tab Navigation */}
+              <div className="border-b border-gray-200 mb-6">
+                <nav className="flex space-x-8">
+                  {tabs.map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
-                      className={`px-4 py-2 text-sm font-medium rounded-2xl border transition-colors ${
-                        tab === 'Users'
-                          ? 'bg-linkedin-blue text-white border-linkedin-blue'
-                          : 'text-gray-700 border-gray-300 hover:bg-gray-50'
+                      className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                        activeTab === tab
+                          ? 'border-linkedin-blue text-linkedin-blue'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                       }`}
                     >
                       {tab}
                     </button>
                   ))}
-                </div>
-              </div>
-            </div>
-
-            {/* User Management Content */}
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              {/* Header */}
-              <div className="px-6 py-4 border-b border-gray-200">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold text-gray-900">Users</h2>
-                  <button className="px-4 py-2 bg-linkedin-blue text-white text-sm font-medium rounded-2xl hover:bg-linkedin-blue-dark transition-colors">
-                    Add user
-                  </button>
-                </div>
+                </nav>
               </div>
 
-              {/* User Table */}
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Active</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {users.map((user) => (
-                      <tr key={user.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                            <div className="text-sm text-gray-500">{user.email}</div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.role}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            user.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                          }`}>
-                            {user.status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.lastActive}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          <div className="flex gap-2">
-                            <button className="text-linkedin-blue hover:text-linkedin-blue font-medium">Edit</button>
-                            <button className="text-red-600 hover:text-red-800 font-medium">Remove</button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* License Overview */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">License Overview</h3>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-linkedin-blue">25</div>
-                  <div className="text-sm text-gray-500">Total Licenses</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">18</div>
-                  <div className="text-sm text-gray-500">Active Users</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600">7</div>
-                  <div className="text-sm text-gray-500">Available</div>
-                </div>
-              </div>
-            </div>
-
-            {/* LinkedIn Products */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">LinkedIn Products</h3>
-              
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-linkedin-blue rounded flex items-center justify-center">
-                      <span className="text-white text-sm font-bold">in</span>
-                    </div>
-                    <div>
-                      <div className="font-medium text-gray-900">LinkedIn Recruiter</div>
-                      <div className="text-sm text-gray-500">Professional recruiting solution</div>
+              {/* Users Tab Content */}
+              {activeTab === 'Users' && (
+                <div>
+                  {/* Section Header with Actions */}
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-lg font-medium text-gray-900">All users</h2>
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <button className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
+                          More actions
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
+                      </div>
+                      <div className="relative">
+                        <button className="flex items-center gap-2 px-4 py-2 bg-linkedin-blue text-white text-sm font-medium rounded-md hover:bg-linkedin-blue-dark">
+                          Add new users
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-sm font-medium text-gray-900">15 seats</div>
-                    <div className="text-xs text-gray-500">12 active</div>
-                  </div>
-                </div>
 
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-linkedin-blue rounded flex items-center justify-center">
-                      <span className="text-white text-sm font-bold">in</span>
+                  {/* Search and Filters */}
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="Search keywords"
+                        className="pl-10 pr-4 py-2 border border-gray-300 rounded-md w-80 focus:ring-linkedin-blue focus:border-linkedin-blue"
+                      />
                     </div>
-                    <div>
-                      <div className="font-medium text-gray-900">LinkedIn Jobs</div>
-                      <div className="text-sm text-gray-500">Job posting and promotion</div>
-                    </div>
+                    <button className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z" />
+                      </svg>
+                      Filters
+                    </button>
                   </div>
-                  <div className="text-right">
-                    <div className="text-sm font-medium text-gray-900">10 seats</div>
-                    <div className="text-xs text-gray-500">6 active</div>
+
+                  {/* Data Table */}
+                  <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="w-12 px-6 py-3">
+                            <input type="checkbox" className="rounded border-gray-300" />
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <div className="flex items-center gap-1">
+                              User
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                              </svg>
+                            </div>
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <div className="flex items-center gap-1">
+                              License
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                              </svg>
+                            </div>
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <div className="flex items-center gap-1">
+                              Manual job posting
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                              </svg>
+                            </div>
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <div className="flex items-center gap-1">
+                              Status
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                              </svg>
+                            </div>
+                          </th>
+                          <th className="w-12 px-6 py-3"></th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {users.map((user) => (
+                          <tr key={user.id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4">
+                              <input type="checkbox" className="rounded border-gray-300" />
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-sm font-medium text-gray-600">
+                                  {user.initials}
+                                </div>
+                                <span className="text-sm text-gray-900">{user.email}</span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {user.license}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {user.manualJobPosting}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">{user.status}</div>
+                              <div className="text-xs text-gray-500">{user.date}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                              <button className="text-gray-400 hover:text-gray-600">
+                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                                </svg>
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    
+                    {/* Table Footer */}
+                    <div className="px-6 py-3 border-t border-gray-200 text-sm text-gray-500">
+                      Showing 3 of 3
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
+
+              {/* Other tab contents would go here */}
+              {activeTab !== 'Users' && (
+                <div className="text-center py-12">
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">{activeTab}</h3>
+                  <p className="text-gray-500">This section is coming soon.</p>
+                </div>
+              )}
             </div>
           </div>
         </main>
